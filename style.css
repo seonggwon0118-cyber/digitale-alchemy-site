@@ -1,0 +1,285 @@
+/* 기본 설정 */
+
+body{
+  margin:0;
+  background:black;
+  overflow:hidden;
+  font-family:'DotGothic16', monospace;
+}
+
+
+/* ---------- INDEX PAGE ---------- */
+
+.home{
+  width:100vw;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.title{
+  position:absolute;
+  top:40px;
+  left:50%;
+  transform:translateX(-50%);
+  color:#00ff9c;
+  font-size:40px;
+  z-index:10;
+  letter-spacing:6px;
+  text-shadow:0 0 10px #00ff9c;
+}
+
+.main-video{
+  width:60vw;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+
+
+/* ---------- PORTAL PAGE ---------- */
+
+.portal-page{
+  background:#050505;
+  overflow:hidden;
+}
+
+/* vortex canvas */
+
+#flow{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* portal image */
+
+.portal-image{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:220px;
+  z-index:10;
+  pointer-events:none;
+}
+
+/* ---------- MAIN PAGE ---------- */
+
+.main-page{
+  position:relative;
+  width:100vw;
+  height:100vh;
+
+  /* 배경 이미지 */
+
+  background-image:url("image/background.jpg");
+  background-size:cover;
+  background-position:center;
+
+  overflow:hidden;
+}
+
+
+/* ---------- DATA RAIN ---------- */
+
+#rain{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+
+  z-index:1;
+
+  pointer-events:none;
+}
+
+/* ---------- TOP IMAGE ---------- */
+
+.top-image{
+    filter: drop-shadow(0 0 20px #00ff9c);
+position:fixed;
+
+top:50%;
+left:50%;
+
+transform:translate(-50%,-50%);
+
+width:32vw;
+
+z-index:20;
+
+pointer-events:none;
+}
+
+/* ---------- UI ---------- */
+
+.back{
+  position:fixed;
+  top:20px;
+  left:20px;
+  color:white;
+  text-decoration:none;
+  font-size:20px;
+
+  z-index:999;
+}
+
+.sphere{
+
+position:absolute;
+
+width:220px;
+height:220px;
+
+border-radius:50%;
+
+z-index:30;
+
+animation: sphereFloat 6s ease-in-out infinite;
+
+}
+
+/* 왼쪽 */
+
+.sphere-left{
+
+left:10%;
+top:40%;
+
+background:
+repeating-radial-gradient(
+circle at center,
+rgba(255,0,0,0.9) 0px,
+rgba(255,0,0,0.9) 3px,
+transparent 3px,
+transparent 18px
+),
+radial-gradient(circle at 30% 30%, #ffe816);
+
+box-shadow:0 0 40px #ffd500;
+
+}
+
+/* 오른쪽 */
+
+.sphere-right{
+
+right:10%;
+top: 40%;
+
+background:
+repeating-radial-gradient(
+circle at center,
+rgba(255,255,255,0.9) 0px,
+rgba(255,255,255,0.9) 2px,
+transparent 2px,
+transparent 16px
+),
+radial-gradient(circle at 30% 30%, #1040ff);
+
+box-shadow:0 0 40px #4bb3ff;
+
+}
+
+.sphere-img:hover{
+
+transform: scale(1.15);
+
+filter: drop-shadow(0 0 40px rgba(255,255,255,0.9));
+
+}
+
+.sphere::after{
+
+content:"";
+
+position:absolute;
+
+width:100%;
+height:100%;
+
+border-radius:50%;
+
+background: repeating-radial-gradient(
+circle,
+rgba(255,255,255,0.2) 0px,
+rgba(255,255,255,0.2) 2px,
+transparent 4px
+);
+
+animation: rotateSphere 20s linear infinite;
+
+}
+
+@keyframes rotateSphere{
+
+from{ transform:rotate(0deg); }
+to{ transform:rotate(360deg); }
+
+}
+
+/* 떠있는 느낌 */
+
+@keyframes sphereFloat{
+0%{ transform:translateY(0px); }
+50%{ transform:translateY(-12px); }
+100%{ transform:translateY(0px); }
+}
+
+/*-----day-cycle----*/
+
+.day-page{
+background:black;
+width:100vw;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+}
+
+.clock{
+position:relative;
+width:600px;
+height:600px;
+animation: orbitRotate 180s linear infinitie;
+}
+
+.node{
+position:absolute;
+width:70px;
+transform:translate(-50%,-50%);
+}
+
+/* 중앙 이미지 */
+
+.center{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:320px;
+z-index:10;
+}
+
+.center img{
+width:100%;
+}
+
+#centerImage{
+transition: opacity 0.6s ease;
+}
+
+@keyframes orbitRotate{
+
+from{ transform: rotate(0deg); }
+to{ transform: rotate(360deg); }
+
+}
