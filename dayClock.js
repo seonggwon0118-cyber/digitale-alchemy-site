@@ -1,5 +1,9 @@
 const centerImage = document.getElementById("centerImage");
 const nodes = document.querySelectorAll(".node");
+const background = document.querySelector(".background");
+const clock = document.querySelector(".clock");
+
+/* 중앙 이미지 */
 
 const images = [
 "image/day1.png",
@@ -14,7 +18,23 @@ const images = [
 "image/day10.png"
 ];
 
-/* 연결될 페이지 */
+/* 배경 이미지 */
+
+const backgrounds = [
+"image/bg_day1.png",
+"image/bg_day2.png",
+"image/bg_day3.png",
+"image/bg_day4.png",
+"image/bg_day5.png",
+"image/bg_day6.png",
+"image/bg_day7.png",
+"image/bg_day8.png",
+"image/bg_day9.png",
+"image/bg_day10.png"
+];
+
+/* 연결 페이지 */
+
 const pages = [
 "day1.html",
 "day2.html",
@@ -28,18 +48,22 @@ const pages = [
 "day10.html"
 ];
 
+/* 시간 스케줄 */
+
 const schedule = [
-1,   // day10 시작
-5,   // day1 시작
-7,   // day2 시작
-9,   // day3 시작
-11,  // day4 시작
-13,  // day5 시작
-15,  // day6 시작
-17,  // day7 시작
-19,  // day8 시작
-21   // day9 시작
+1,   // day10
+5,   // day1
+7,   // day2
+9,   // day3
+11,  // day4
+13,  // day5
+15,  // day6
+17,  // day7
+19,  // day8
+21   // day9
 ];
+
+/* ---------- 파리 시간 ---------- */
 
 function getParisHour(){
 
@@ -55,28 +79,25 @@ return parseInt(hour);
 
 }
 
+/* ---------- 현재 index ---------- */
+
 function getCurrentIndex(){
 
 const hour = getParisHour();
-let index = 9;
 
-for(let i=0;i<schedule.length;i++){
+for(let i=schedule.length-1;i>=0;i--){
 
 if(hour >= schedule[i]){
-index = i-1;
+return i;
 }
 
 }
 
-if(index < 0){
-index = 9;
-}
-
-return index;
+return 0;
 
 }
 
-/* ---------- 시계 회전 ---------- */
+/* ---------- 시계 orbit ---------- */
 
 let rotation = 0;
 
@@ -86,7 +107,7 @@ rotation += 0.002;
 
 const radius = 400;
 
-const clock = document.querySelector(".clock");
+
 
 const cx = clock.offsetWidth / 2;
 const cy = clock.offsetHeight / 2;
@@ -107,11 +128,14 @@ requestAnimationFrame(animateClock);
 
 }
 
-/* ---------- 중앙 이미지 업데이트 ---------- */
+/* ---------- 이미지 + 배경 업데이트 ---------- */
 
-function updateImage(){
+function updateVisual(){
 
 const index = getCurrentIndex();
+const background = document.querySelector(".background");
+
+/* 중앙 이미지 */
 
 centerImage.style.opacity = 0;
 
@@ -120,10 +144,25 @@ centerImage.src = images[index];
 centerImage.style.opacity = 1;
 },300);
 
-/* 중앙 이미지와 같은 노드 숨기기 */
+/* 배경 */
+
+document.querySelector(".background").style.backgroundImage = "url(" + backgrounds[index] + ")";
+
+/* 현재 노드 숨기기 */
 
 nodes.forEach((node,i)=>{
 node.style.opacity = (i===index)?0:1;
+});
+
+}
+
+/* ---------- preload ---------- */
+
+function preloadImages(){
+
+[...images,...backgrounds].forEach(src=>{
+const img = new Image();
+img.src = src;
 });
 
 }
@@ -132,7 +171,7 @@ node.style.opacity = (i===index)?0:1;
 
 nodes.forEach((node,i)=>{
 
-node.style.cursor = "pointer";
+node.style.cursor="pointer";
 
 node.addEventListener("click",()=>{
 window.location.href = pages[i];
@@ -142,16 +181,23 @@ window.location.href = pages[i];
 
 /* 중앙 이미지 클릭 */
 
-centerImage.style.cursor = "pointer";
+centerImage.style.cursor="pointer";
 
 centerImage.addEventListener("click",()=>{
+
 const index = getCurrentIndex();
+
 window.location.href = pages[index];
+
 });
 
 /* ---------- 실행 ---------- */
+window.onload = function(){
+preloadImages();
 
 animateClock();
-updateImage();
 
-setInterval(updateImage,60000);
+updateVisual();
+
+setInterval(updateVisual,60000);
+};

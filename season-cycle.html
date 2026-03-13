@@ -1,35 +1,41 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ko">
 <head>
-
-<meta charset="UTF-8">
-<title>Day 1</title>
-
-<link rel="stylesheet" href="style.css">
-
-<style>
-
-body{
-margin:0;
-background:black;
-width:100vw;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-overflow:hidden;
-}
-
-</style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Season</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
 
-<a href="main.html" class="back">BACK</a>
+  <!-- Vanta 배경 -->
+  <div id="bg"></div>
 
+  <!-- 계절 패널 -->
+  <div class="season-panel">
+    <a href="spring.html" class="season">
+      <img src="image/spring_main.jpg" alt="spring">
+    </a>
+
+    <a href="summer.html" class="season">
+      <img src="image/summer_main.jpg" alt="summer">
+    </a>
+
+    <a href="autumn.html" class="season">
+      <img src="image/autumn_main.jpg" alt="autumn">
+    </a>
+
+    <a href="winter.html" class="season">
+      <img src="image/winter_main.jpg" alt="winter">
+    </a>
+  </div>
+
+  <!-- 뒤로가기 -->
+  <a href="main.html" class="back">BACK</a>
+
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://unpkg.com/vanta@latest/dist/vanta.clouds.min.js"></script>
+
+<script src="season.js"></script>
 </body>
-
 </html>
