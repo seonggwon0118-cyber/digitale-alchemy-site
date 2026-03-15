@@ -4,17 +4,46 @@ const ctx = canvas.getContext("2d")
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
+/* ---------- UI ---------- */
+
 const uiTemp = document.getElementById("temp")
 const uiLife = document.getElementById("life")
 const uiDb = document.getElementById("db")
-const uiPhase = document.getElementById("phase")
+const uiTime = document.getElementById("time")
+
+/* ---------- 상태 ---------- */
 
 let temp = 50
 let life = 5
 let database = 0
 let combo = 0
+let time = 60
 
 let gameOver = false
+
+/* ---------- DATA 이미지 ---------- */
+
+const data5 = new Image()
+data5.src = "image/data5.png"
+
+const data6 = new Image()
+data6.src = "image/data6.png"
+
+/* ---------- 화로 이미지 ---------- */
+
+const furnaceOff = new Image()
+furnaceOff.src = "image/furnace_off.png"
+
+const furnaceSmall = new Image()
+furnaceSmall.src = "image/furnace_small.png"
+
+const furnaceMedium = new Image()
+furnaceMedium.src = "image/furnace_medium.png"
+
+const furnaceBig = new Image()
+furnaceBig.src = "image/furnace_big.png"
+
+/* ---------- 레인 ---------- */
 
 const lanes = [
 canvas.width/2 - 140,
@@ -30,6 +59,8 @@ let speed = 3.5
 
 const notes = []
 
+/* ---------- 노트 타입 ---------- */
+
 const types = [
 "DATA","DATA",
 "NOISE",
@@ -37,60 +68,89 @@ const types = [
 "OLD"
 ]
 
+/* ---------- 노트 생성 ---------- */
+
 function spawnNote(){
 
 if(gameOver) return
 
 const lane = Math.floor(Math.random()*3)
+const type = types[Math.floor(Math.random()*types.length)]
 
 notes.push({
 lane: lane,
-type: types[Math.floor(Math.random()*types.length)],
-y: -40
+type: type,
+y: -40,
+img: Math.random()<0.5 ? data5 : data6
 })
 
 }
 
 setInterval(spawnNote,700)
 
+/* ---------- UI ---------- */
+
 function updateUI(){
 
-uiTemp.innerText = Math.floor(temp)
+uiTemp.innerText = Math.floor(temp) + "°"
 uiLife.innerText = life
 uiDb.innerText = database
+uiTime.innerText = time
 
 }
 
-function endGame(text){
+/* ---------- 타이머 ---------- */
 
-gameOver = true
-uiPhase.innerText = text
-
-}
-
-document.addEventListener("keydown",(e)=>{
+setInterval(()=>{
 
 if(gameOver) return
 
-const lane = keys.indexOf(e.key)
+time--
 
-if(lane === -1) return
+if(time<=0){
 
-let target = null
-let index = -1
-let bestDist = 9999
+time=0
+gameOver=true
+
+setTimeout(()=>{
+
+if(temp>=100){
+alert("HIVER TERMINÉ")
+}else{
+alert("ÉCHEC")
+}
+
+location.reload()
+
+},400)
+
+}
+
+updateUI()
+
+},1000)
+
+/* ---------- 노트 판정 함수 ---------- */
+
+function hitLane(lane){
+
+if(gameOver) return
+
+let target=null
+let index=-1
+let bestDist=9999
 
 for(let i=0;i<notes.length;i++){
 
-if(notes[i].lane === lane){
+if(notes[i].lane===lane){
 
-const dist = Math.abs(notes[i].y - hitLine)
+const dist=Math.abs(notes[i].y-hitLine)
 
-if(dist < bestDist && dist < 160){
+if(dist<bestDist && dist<160){
 
-bestDist = dist
-target = notes[i]
-index = i
+bestDist=dist
+target=notes[i]
+index=i
 
 }
 
@@ -100,19 +160,19 @@ index = i
 
 if(!target) return
 
-if(target.type === "DATA"){
+if(target.type==="DATA"){
 
-temp += 5
-life -= 1
-combo = 0
+temp+=5
+life-=1
+combo=0
 
 }else{
 
 combo++
 
-let bonus = Math.floor(combo/3)
+let bonus=Math.floor(combo/3)
 
-temp += 3 + bonus
+temp+=3+bonus
 
 }
 
@@ -120,74 +180,214 @@ notes.splice(index,1)
 
 updateUI()
 
-if(life <= 0){
+if(life<=0){
 
-life = 0
+life=0
 updateUI()
-endGame("SYSTEM FAILURE")
+
+gameOver=true
+
+setTimeout(()=>{
+alert("ÉCHEC")
+location.reload()
+},400)
+
 return
 
 }
 
-if(temp >= 100){
+if(temp>=100){
 
-endGame("WINTER SURVIVED")
+gameOver=true
+
+setTimeout(()=>{
+alert("HIVER TERMINÉ")
+location.reload()
+},400)
+
 return
 
+}
+
+}
+
+/* ---------- 키 입력 ---------- */
+
+document.addEventListener("keydown",(e)=>{
+
+const lane = keys.indexOf(e.key)
+
+if(lane!==-1){
+hitLane(lane)
 }
 
 })
 
-function update(){
+/* ---------- 모바일 터치 입력 ---------- */
 
-if(gameOver){
+canvas.addEventListener("touchstart",(e)=>{
 
-ctx.fillStyle="black"
-ctx.font="40px monospace"
-ctx.textAlign="center"
-ctx.fillText(uiPhase.innerText,canvas.width/2,canvas.height/2)
+const touch = e.touches[0]
 
-return
+const x = touch.clientX
+
+let lane = 0
+
+if(x < canvas.width/3){
+lane = 0
+}
+else if(x < canvas.width*2/3){
+lane = 1
+}
+else{
+lane = 2
 }
 
+hitLane(lane)
+
+e.preventDefault()
+
+},{passive:false})
+
+/* ---------- 화로 상태 ---------- */
+
+function getFurnace(){
+
+if(gameOver && temp>=100) return furnaceBig
+
+if(combo>=10) return furnaceMedium
+
+if(temp>=55) return furnaceSmall
+
+return furnaceOff
+
+}
+
+/* ---------- 비율 유지 이미지 ---------- */
+
+function drawImageRatio(img,x,y,height){
+
+const ratio = img.width / img.height
+const width = height * ratio
+
+ctx.drawImage(
+img,
+x - width/2,
+y - height/2,
+width,
+height
+)
+
+}
+
+/* ---------- 콤보 ---------- */
+
+function drawCombo(){
+
+if(combo>1){
+
+ctx.font="28px monospace"
+ctx.fillStyle="white"
+ctx.textAlign="center"
+
+ctx.fillText(
+"COMBO x"+combo,
+canvas.width/2,
+120
+)
+
+}
+
+}
+
+/* ---------- 게임 루프 ---------- */
+
+function update(){
+
 ctx.clearRect(0,0,canvas.width,canvas.height)
+
+/* 화로 */
+
+const furnace = getFurnace()
+
+drawImageRatio(
+furnace,
+canvas.width*0.15,
+canvas.height*0.5,
+600
+)
+
+drawImageRatio(
+furnace,
+canvas.width*0.85,
+canvas.height*0.5,
+600
+)
 
 ctx.textAlign="center"
 ctx.font="28px monospace"
 
+/* 노트 */
+
 for(let i=notes.length-1;i>=0;i--){
 
-const n = notes[i]
+const n=notes[i]
 
-n.y += speed
+n.y+=speed
 
-ctx.fillStyle="black"
-ctx.fillText(n.type,lanes[n.lane],n.y)
+if(n.type==="DATA"){
 
-if(n.type==="DATA" && n.y > hitLine+60){
+drawImageRatio(
+n.img,
+lanes[n.lane],
+n.y,
+90
+)
+
+}
+
+else{
+
+ctx.fillStyle="white"
+
+ctx.fillText(
+n.type,
+lanes[n.lane],
+n.y
+)
+
+}
+
+if(n.type==="DATA" && n.y>hitLine+60){
 
 database++
 notes.splice(i,1)
 
 }
 
-if(n.type!=="DATA" && n.y > hitLine+60){
+if(n.type!=="DATA" && n.y>hitLine+60){
 
 life--
-combo = 0
+combo=0
 notes.splice(i,1)
 
 }
 
 }
 
-temp -= 0.02
+temp-=0.02
 
 updateUI()
 
-if(temp <=0){
+if(temp<=0){
 
-endGame("SYSTEM FROZEN")
+gameOver=true
+
+setTimeout(()=>{
+alert("ÉCHEC")
+location.reload()
+},400)
+
 return
 
 }
@@ -195,15 +395,17 @@ return
 drawLanes()
 drawCombo()
 
-speed += 0.0005
+speed+=0.0005
 
 requestAnimationFrame(update)
 
 }
 
+/* ---------- 레인 ---------- */
+
 function drawLanes(){
 
-ctx.strokeStyle="rgba(0,0,0,0.2)"
+ctx.strokeStyle="rgba(255,255,255,0.2)"
 
 for(let i=0;i<3;i++){
 
@@ -214,7 +416,8 @@ ctx.stroke()
 
 }
 
-ctx.fillStyle="rgba(0,0,0,0.08)"
+ctx.fillStyle="rgba(255,255,255,0.08)"
+
 ctx.fillRect(
 lanes[0]-100,
 hitLine-80,
@@ -222,7 +425,7 @@ lanes[2]-lanes[0]+200,
 160
 )
 
-ctx.strokeStyle="black"
+ctx.strokeStyle="white"
 ctx.lineWidth=6
 
 ctx.beginPath()
@@ -231,24 +434,11 @@ ctx.lineTo(lanes[2]+100,hitLine)
 ctx.stroke()
 
 ctx.font="20px monospace"
-
-ctx.fillStyle="black"
+ctx.fillStyle="white"
 
 ctx.fillText("A",lanes[0],hitLine+40)
 ctx.fillText("S",lanes[1],hitLine+40)
 ctx.fillText("D",lanes[2],hitLine+40)
-
-}
-
-function drawCombo(){
-
-if(combo > 1){
-
-ctx.font="26px monospace"
-ctx.fillStyle="red"
-ctx.fillText("COMBO x"+combo,canvas.width/2,120)
-
-}
 
 }
 

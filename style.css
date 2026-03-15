@@ -125,6 +125,7 @@ pointer-events:none;
   top:20px;
   left:20px;
   color:white;
+  font-family:monospace !important;
   text-decoration:none;
   font-size:20px;
 
@@ -434,7 +435,7 @@ color:white;
 font-size:20px;
 font-family:monospace;
 font-weight:bold;
-text-align:right;
+text-align:left;
 }
 
 #time{
@@ -526,6 +527,7 @@ canvas{
 position:fixed;
 top:0;
 left:0;
+z-index:5;
 }
 
 #game{
@@ -533,49 +535,57 @@ width:100vw;
 height:100vh;
 }
 
-#time{
+/* Retour */
+
+.back{
 position:fixed;
 top:20px;
 left:20px;
+z-index:10;
+
 color:white;
 font-family:monospace;
-font-size:20px;
+text-decoration:none;
+font-weight:bold;
 }
 
-#fall{
-position:fixed;
-top:50px;
-left:20px;
-color:white;
-font-family:monospace;
-font-size:20px;
-}
+/* UI */
 
 #ui{
 position:fixed;
 top:20px;
-left:20px;
-
-z-index:5;
-
-color:white;
-font-family:monospace;
+right:20px;
+z-index:10;
 
 display:flex;
 flex-direction:column;
 gap:6px;
 
+color:white;
+font-family:monospace;
 font-size:20px;
 }
 
-#phase{
-font-size:24px;
-font-weight:bold;
-margin-bottom:6px;
-}
+/* 한 줄 */
 
 .stat{
-opacity:0.9;
+display:flex;
+gap:8px;
+align-items:center;
+}
+
+/* 라벨 */
+
+.label{
+min-width:110px;
+text-align:light;
+}
+
+/* 숫자 */
+
+.value{
+width:30px;
+text-align:right;
 }
 
 body.winter{
@@ -583,8 +593,35 @@ background:#7a2cff;
 }
 
 .file{
-  position:absolute;
-  color:black;
-  font-family: monospace;
-  font-size: 20px;
+position:absolute;
+color:white;
+font-family:'DotGothic16', monospace;
+font-size:20px;
+pointer-events:none;
+}
+
+/* ===== WINTER UI FIX ===== */
+
+body.winter #ui{
+position:fixed;
+top:20px;
+right:20px;
+z-index:20;
+
+display:flex;
+flex-direction:column;
+gap:8px;
+
+color:white;
+font-family:monospace;
+font-size:20px;
+}
+
+/* 모든 개별 위치 강제 제거 */
+
+body.winter #temp,
+body.winter #life,
+body.winter #time,
+body.winter #db{
+position:static !important;
 }

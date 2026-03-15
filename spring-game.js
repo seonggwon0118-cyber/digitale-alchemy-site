@@ -49,7 +49,7 @@ timeUI.style.zIndex="5"
 document.body.appendChild(timeUI)
 
 
-/* SCORE 위치 강제 수정 */
+/* SCORE 위치 */
 
 scoreUI.style.position="fixed"
 scoreUI.style.right="20px"
@@ -93,11 +93,24 @@ img:dataImages[Math.floor(Math.random()*2)]
 setInterval(spawn,450)
 
 
-/* 마우스 이동 */
+/* -------- PC 마우스 -------- */
 
 window.addEventListener("mousemove",e=>{
 player.x = e.clientX
 })
+
+
+/* -------- 모바일 터치 -------- */
+
+window.addEventListener("touchmove",e=>{
+
+const touch = e.touches[0]
+
+player.x = touch.clientX
+
+e.preventDefault()
+
+},{passive:false})
 
 
 /* 나무 성장 */

@@ -15,6 +15,7 @@ let gameOver = false
 
 const fish = []
 
+
 /* 이미지 */
 
 const carpImg = new Image()
@@ -32,6 +33,7 @@ dataImg3.src = "image/data3.png"
 const dataImg4 = new Image()
 dataImg4.src = "image/data4.png"
 
+
 /* 낚시 바늘 */
 
 const hook = {
@@ -40,21 +42,31 @@ y: canvas.height*0.35,
 size:12
 }
 
+
 /* 좌우 이동 제한 */
 
-const waterLeft = canvas.width * 0.15
-const waterRight = canvas.width * 0.85
+function getWaterLeft(){
+return canvas.width * 0.15
+}
+
+function getWaterRight(){
+return canvas.width * 0.85
+}
+
+
+/* -------- PC 마우스 -------- */
 
 document.addEventListener("mousemove",(e)=>{
 
 let x = e.clientX
 
-if(x < waterLeft) x = waterLeft
-if(x > waterRight) x = waterRight
+if(x < getWaterLeft()) x = getWaterLeft()
+if(x > getWaterRight()) x = getWaterRight()
 
 hook.x = x
 
 })
+
 
 document.addEventListener("mousedown",()=>{
 lineDown = true
@@ -63,6 +75,35 @@ lineDown = true
 document.addEventListener("mouseup",()=>{
 lineDown = false
 })
+
+
+/* -------- 모바일 터치 -------- */
+
+document.addEventListener("touchmove",(e)=>{
+
+const touch = e.touches[0]
+
+let x = touch.clientX
+
+if(x < getWaterLeft()) x = getWaterLeft()
+if(x > getWaterRight()) x = getWaterRight()
+
+hook.x = x
+
+e.preventDefault()
+
+},{passive:false})
+
+
+document.addEventListener("touchstart",()=>{
+lineDown = true
+})
+
+
+document.addEventListener("touchend",()=>{
+lineDown = false
+})
+
 
 /* 타이머 */
 
@@ -95,6 +136,7 @@ location.reload()
 }
 
 },1000)
+
 
 /* 스폰 */
 
@@ -173,11 +215,13 @@ fish.push(obj)
 
 setInterval(spawnFish,1200)
 
+
 /* 게임 루프 */
 
 function update(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height)
+
 
 /* 낚시줄 */
 
@@ -194,6 +238,7 @@ hook.y = canvas.height*0.35
 if(hook.y > canvas.height*0.8){
 hook.y = canvas.height*0.8
 }
+
 
 /* 물고기 */
 
@@ -222,6 +267,7 @@ ctx.drawImage(img,f.x-w/2,f.y-h/2,w,h)
 }
 
 ctx.restore()
+
 
 /* 충돌 */
 
@@ -258,7 +304,6 @@ if(time < 0) time = 0
 
 document.getElementById("score").innerText = "POISSONS : " + score
 
-/* 목표 점수 도달 */
 
 if(score >= 100 && !gameOver){
 
@@ -280,6 +325,7 @@ fish.splice(i,1)
 }
 
 })
+
 
 /* 낚시줄 */
 
