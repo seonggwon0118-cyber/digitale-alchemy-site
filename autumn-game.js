@@ -131,10 +131,8 @@ if(cleanTime === 0 && virusCount > 0){
 gameOver = true
 
 setTimeout(()=>{
-
 alert("ÉCHEC")
 location.reload()
-
 },400)
 
 }
@@ -146,9 +144,7 @@ else if(phase === "shake"){
 shakeTime--
 
 if(shakeTime === 0){
-
 phase = "end"
-
 }
 
 }
@@ -159,7 +155,7 @@ updateUI()
 
 setInterval(updateTimer,1000)
 
-/* ---------- 마우스 드래그 ---------- */
+/* ---------- 드래그 ---------- */
 
 canvas.addEventListener("mousedown",(e)=>{
 
@@ -300,7 +296,10 @@ return
 
 const now = Date.now()
 
-if(now - lastShake < 120) return
+/* 모바일 터치 제한 완화 */
+
+const shakeDelay = isMobile ? 40 : 120
+if(now - lastShake < shakeDelay) return
 
 lastShake = now
 
