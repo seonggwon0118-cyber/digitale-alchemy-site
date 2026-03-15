@@ -63,9 +63,9 @@ const notes = []
 
 const types = [
 "DATA","DATA",
-"NOISE",
+"BRUIT",
 "CACHE",
-"OLD"
+"OBSOLETE"
 ]
 
 /* ---------- 노트 생성 ---------- */
