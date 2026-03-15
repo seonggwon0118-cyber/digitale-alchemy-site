@@ -4,9 +4,9 @@ const ctx = canvas.getContext("2d")
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
-/* ---------- 모바일 감지 (추가) ---------- */
+/* ---------- 모바일 감지 ---------- */
 
-const isMobile = canvas.width < 700
+const isMobile = window.innerWidth < 700
 
 /* ---------- UI ---------- */
 
@@ -49,17 +49,17 @@ furnaceBig.src = "image/furnace_big.png"
 
 /* ---------- 레인 ---------- */
 
-const laneOffset = isMobile ? 80 : 140
+const laneOffset = isMobile ? 90 : 140
 
 const lanes = [
-canvas.width/2 - laneOffset,
-canvas.width/2,
-canvas.width/2 + laneOffset
+window.innerWidth/2 - laneOffset,
+window.innerWidth/2,
+window.innerWidth/2 + laneOffset
 ]
 
 const keys = ["a","s","d"]
 
-const hitLine = canvas.height - (isMobile ? 110 : 140)
+const hitLine = window.innerHeight - (isMobile ? 110 : 140)
 
 let speed = 3.5
 
@@ -136,7 +136,7 @@ updateUI()
 
 },1000)
 
-/* ---------- 노트 판정 함수 ---------- */
+/* ---------- 노트 판정 ---------- */
 
 function hitLane(lane){
 
@@ -172,7 +172,8 @@ temp+=5
 life-=1
 combo=0
 
-}else{
+}
+else{
 
 combo++
 
@@ -229,7 +230,7 @@ hitLane(lane)
 
 })
 
-/* ---------- 모바일 터치 입력 ---------- */
+/* ---------- 모바일 터치 ---------- */
 
 canvas.addEventListener("touchstart",(e)=>{
 
@@ -238,8 +239,8 @@ const x = touch.clientX
 
 let lane = 0
 
-if(x < canvas.width/3) lane = 0
-else if(x < canvas.width*2/3) lane = 1
+if(x < window.innerWidth/3) lane = 0
+else if(x < window.innerWidth*2/3) lane = 1
 else lane = 2
 
 hitLane(lane)
@@ -260,7 +261,7 @@ return furnaceOff
 
 }
 
-/* ---------- 비율 유지 이미지 ---------- */
+/* ---------- 이미지 비율 ---------- */
 
 function drawImageRatio(img,x,y,height){
 
@@ -283,14 +284,14 @@ function drawCombo(){
 
 if(combo>1){
 
-ctx.font = isMobile ? "22px monospace" : "28px monospace"
+ctx.font="28px monospace"
 ctx.fillStyle="white"
 ctx.textAlign="center"
 
 ctx.fillText(
 "COMBO x"+combo,
-canvas.width/2,
-isMobile ? 90 : 120
+window.innerWidth/2,
+120
 )
 
 }
@@ -301,29 +302,29 @@ isMobile ? 90 : 120
 
 function update(){
 
-ctx.clearRect(0,0,canvas.width,canvas.height)
+ctx.clearRect(0,0,window.innerWidth,window.innerHeight)
 
 /* 화로 */
 
 const furnace = getFurnace()
-const furnaceSize = isMobile ? 320 : 600
+const furnaceSize = isMobile ? 340 : 600
 
 drawImageRatio(
 furnace,
-canvas.width*0.15,
-canvas.height*0.5,
+window.innerWidth*0.15,
+window.innerHeight*0.5,
 furnaceSize
 )
 
 drawImageRatio(
 furnace,
-canvas.width*0.85,
-canvas.height*0.5,
+window.innerWidth*0.85,
+window.innerHeight*0.5,
 furnaceSize
 )
 
 ctx.textAlign="center"
-ctx.font = isMobile ? "22px monospace" : "28px monospace"
+ctx.font="28px monospace"
 
 /* 노트 */
 
@@ -338,19 +339,14 @@ drawImageRatio(
 n.img,
 lanes[n.lane],
 n.y,
-isMobile ? 60 : 90
+isMobile ? 70 : 90
 )
 
 }
 else{
 
 ctx.fillStyle="white"
-
-ctx.fillText(
-n.type,
-lanes[n.lane],
-n.y
-)
+ctx.fillText(n.type,lanes[n.lane],n.y)
 
 }
 
@@ -402,7 +398,7 @@ for(let i=0;i<3;i++){
 
 ctx.beginPath()
 ctx.moveTo(lanes[i],0)
-ctx.lineTo(lanes[i],canvas.height)
+ctx.lineTo(lanes[i],window.innerHeight)
 ctx.stroke()
 
 }
@@ -424,7 +420,7 @@ ctx.moveTo(lanes[0]-100,hitLine)
 ctx.lineTo(lanes[2]+100,hitLine)
 ctx.stroke()
 
-ctx.font = isMobile ? "16px monospace" : "20px monospace"
+ctx.font="20px monospace"
 ctx.fillStyle="white"
 
 ctx.fillText("A",lanes[0],hitLine+40)

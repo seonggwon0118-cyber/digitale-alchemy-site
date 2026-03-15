@@ -1,7 +1,7 @@
 const canvas = document.getElementById("game")
 const ctx = canvas.getContext("2d")
 
-/* ---------- 해상도 보정 (추가) ---------- */
+/* ---------- 해상도 보정 ---------- */
 
 const ratio = window.devicePixelRatio || 1
 canvas.width = window.innerWidth * ratio
@@ -65,8 +65,8 @@ let lastShake = 0
 const tree = {
 x: window.innerWidth/2,
 y: window.innerHeight/2,
-width: isMobile ? 520 : 800,
-height: isMobile ? 520 : 800
+width: isMobile ? 420 : 800,
+height: isMobile ? 420 : 800
 }
 
 /* ---------- 휴지통 ---------- */
@@ -95,11 +95,13 @@ updateUI()
 
 function spawnViruses(){
 
+const range = isMobile ? tree.width*0.7 : tree.width
+
 for(let i=0;i<15;i++){
 
 viruses.push({
 
-x: tree.x + (Math.random()*tree.width - tree.width/2),
+x: tree.x + (Math.random()*range - range/2),
 y: tree.y + (Math.random()*tree.height/2 - tree.height/4),
 size: isMobile ? 24 : 30
 
@@ -124,8 +126,6 @@ if(phase === "clean"){
 
 cleanTime--
 
-if(cleanTime < 0) cleanTime = 0
-
 if(cleanTime === 0 && virusCount > 0){
 
 gameOver = true
@@ -145,8 +145,6 @@ else if(phase === "shake"){
 
 shakeTime--
 
-if(shakeTime < 0) shakeTime = 0
-
 if(shakeTime === 0){
 
 phase = "end"
@@ -161,7 +159,7 @@ updateUI()
 
 setInterval(updateTimer,1000)
 
-/* ---------- 드래그 ---------- */
+/* ---------- 마우스 드래그 ---------- */
 
 canvas.addEventListener("mousedown",(e)=>{
 
@@ -199,6 +197,56 @@ dragging.y = e.clientY
 
 canvas.addEventListener("mouseup",()=>{
 
+handleDrop()
+
+})
+
+/* ---------- 모바일 터치 드래그 ---------- */
+
+canvas.addEventListener("touchstart",(e)=>{
+
+if(gameOver || phase !== "clean") return
+
+const t = e.touches[0]
+const mx = t.clientX
+const my = t.clientY
+
+for(let i=viruses.length-1;i>=0;i--){
+
+const v = viruses[i]
+const dx = v.x - mx
+const dy = v.y - my
+
+if(Math.sqrt(dx*dx + dy*dy) < v.size){
+dragging = v
+break
+}
+
+}
+
+},{passive:false})
+
+canvas.addEventListener("touchmove",(e)=>{
+
+if(!dragging) return
+
+const t = e.touches[0]
+
+dragging.x = t.clientX
+dragging.y = t.clientY
+
+e.preventDefault()
+
+},{passive:false})
+
+canvas.addEventListener("touchend",()=>{
+
+handleDrop()
+
+})
+
+function handleDrop(){
+
 if(!dragging) return
 
 const dx = dragging.x - trash.x
@@ -209,33 +257,27 @@ if(Math.sqrt(dx*dx + dy*dy) < trash.size){
 const index = viruses.indexOf(dragging)
 
 if(index !== -1){
-
 viruses.splice(index,1)
 virusCount--
 updateUI()
-
 }
 
 currentTrashImg = trashOpenImg
 
 setTimeout(()=>{
-
 currentTrashImg = trashClosedImg
-
 },250)
 
 if(virusCount === 0 && phase === "clean"){
-
 phase = "shake"
 updateUI()
-
 }
 
 }
 
 dragging = null
 
-})
+}
 
 /* ---------- 나무 클릭 ---------- */
 
@@ -273,7 +315,7 @@ y: tree.y - 40,
 vy: 3 + Math.random()*1.2,
 drift: Math.random()*1.5 + 1,
 img: leafToggle ? leaf1 : leaf2,
-size: isMobile ? 60 : 80
+size: isMobile ? 50 : 80
 
 })
 
@@ -285,20 +327,18 @@ size: isMobile ? 60 : 80
 
 function update(){
 
-ctx.clearRect(0,0,canvas.width,canvas.height)
+ctx.clearRect(0,0,window.innerWidth,window.innerHeight)
 
 /* 나무 */
 
 const treeImage = fallCount >= 100 ? treeEmptyImg : treeImg
 
 ctx.drawImage(
-
 treeImage,
 tree.x - tree.width/2,
 tree.y - tree.height/2,
 tree.width,
 tree.height
-
 )
 
 /* 바이러스 */
@@ -308,13 +348,11 @@ if(phase === "clean"){
 viruses.forEach(v=>{
 
 ctx.drawImage(
-
 virusImg,
 v.x-30,
 v.y-30,
 isMobile ? 48 : 60,
 isMobile ? 48 : 60
-
 )
 
 })
@@ -324,13 +362,11 @@ isMobile ? 48 : 60
 /* 휴지통 */
 
 ctx.drawImage(
-
 currentTrashImg,
 trash.x - trash.width/2,
 trash.y - trash.height/2,
 trash.width,
 trash.height
-
 )
 
 /* 낙엽 */
@@ -343,24 +379,20 @@ l.y += l.vy
 l.x += Math.sin(l.y*0.05) * l.drift
 
 ctx.drawImage(
-
 l.img,
 l.x - l.size/2,
 l.y - l.size/2,
 l.size,
 l.size
-
 )
 
 if(l.y > window.innerHeight - 100){
 
 groundLeaves.push({
-
 x: l.x,
 y: window.innerHeight - 80,
 img: l.img,
 size: l.size
-
 })
 
 leaves.splice(i,1)
@@ -381,13 +413,11 @@ const offsetY = row*10
 const offsetX = (i%6)*2
 
 ctx.drawImage(
-
 l.img,
 l.x - l.size/2 + offsetX,
 l.y - offsetY,
 l.size,
 l.size
-
 )
 
 })
@@ -423,18 +453,3 @@ requestAnimationFrame(update)
 }
 
 update()
-
-/* ---------- 리사이즈 ---------- */
-
-window.addEventListener("resize",()=>{
-
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
-
-tree.x = window.innerWidth/2
-tree.y = window.innerHeight/2
-
-trash.x = window.innerWidth - (isMobile ? 90 : 130)
-trash.y = window.innerHeight - (isMobile ? 90 : 130)
-
-})
