@@ -4,6 +4,10 @@ const ctx = canvas.getContext("2d")
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
+/* ---------- 모바일 감지 (추가) ---------- */
+
+const isMobile = canvas.width < 700
+
 /* ---------- UI ---------- */
 
 const uiTemp = document.getElementById("temp")
@@ -45,15 +49,17 @@ furnaceBig.src = "image/furnace_big.png"
 
 /* ---------- 레인 ---------- */
 
+const laneOffset = isMobile ? 80 : 140
+
 const lanes = [
-canvas.width/2 - 140,
+canvas.width/2 - laneOffset,
 canvas.width/2,
-canvas.width/2 + 140
+canvas.width/2 + laneOffset
 ]
 
 const keys = ["a","s","d"]
 
-const hitLine = canvas.height - 140
+const hitLine = canvas.height - (isMobile ? 110 : 140)
 
 let speed = 3.5
 
@@ -228,20 +234,13 @@ hitLane(lane)
 canvas.addEventListener("touchstart",(e)=>{
 
 const touch = e.touches[0]
-
 const x = touch.clientX
 
 let lane = 0
 
-if(x < canvas.width/3){
-lane = 0
-}
-else if(x < canvas.width*2/3){
-lane = 1
-}
-else{
-lane = 2
-}
+if(x < canvas.width/3) lane = 0
+else if(x < canvas.width*2/3) lane = 1
+else lane = 2
 
 hitLane(lane)
 
@@ -254,9 +253,7 @@ e.preventDefault()
 function getFurnace(){
 
 if(gameOver && temp>=100) return furnaceBig
-
 if(combo>=10) return furnaceMedium
-
 if(temp>=55) return furnaceSmall
 
 return furnaceOff
@@ -286,14 +283,14 @@ function drawCombo(){
 
 if(combo>1){
 
-ctx.font="28px monospace"
+ctx.font = isMobile ? "22px monospace" : "28px monospace"
 ctx.fillStyle="white"
 ctx.textAlign="center"
 
 ctx.fillText(
 "COMBO x"+combo,
 canvas.width/2,
-120
+isMobile ? 90 : 120
 )
 
 }
@@ -309,30 +306,30 @@ ctx.clearRect(0,0,canvas.width,canvas.height)
 /* 화로 */
 
 const furnace = getFurnace()
+const furnaceSize = isMobile ? 320 : 600
 
 drawImageRatio(
 furnace,
 canvas.width*0.15,
 canvas.height*0.5,
-600
+furnaceSize
 )
 
 drawImageRatio(
 furnace,
 canvas.width*0.85,
 canvas.height*0.5,
-600
+furnaceSize
 )
 
 ctx.textAlign="center"
-ctx.font="28px monospace"
+ctx.font = isMobile ? "22px monospace" : "28px monospace"
 
 /* 노트 */
 
 for(let i=notes.length-1;i>=0;i--){
 
 const n=notes[i]
-
 n.y+=speed
 
 if(n.type==="DATA"){
@@ -341,11 +338,10 @@ drawImageRatio(
 n.img,
 lanes[n.lane],
 n.y,
-90
+isMobile ? 60 : 90
 )
 
 }
-
 else{
 
 ctx.fillStyle="white"
@@ -359,24 +355,19 @@ n.y
 }
 
 if(n.type==="DATA" && n.y>hitLine+60){
-
 database++
 notes.splice(i,1)
-
 }
 
 if(n.type!=="DATA" && n.y>hitLine+60){
-
 life--
 combo=0
 notes.splice(i,1)
-
 }
 
 }
 
 temp-=0.02
-
 updateUI()
 
 if(temp<=0){
@@ -433,7 +424,7 @@ ctx.moveTo(lanes[0]-100,hitLine)
 ctx.lineTo(lanes[2]+100,hitLine)
 ctx.stroke()
 
-ctx.font="20px monospace"
+ctx.font = isMobile ? "16px monospace" : "20px monospace"
 ctx.fillStyle="white"
 
 ctx.fillText("A",lanes[0],hitLine+40)
