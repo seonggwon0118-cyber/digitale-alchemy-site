@@ -3,201 +3,177 @@ const nodes = document.querySelectorAll(".node");
 const background = document.querySelector(".background");
 const clock = document.querySelector(".clock");
 
-/* 중앙 이미지 */
+/* 중심 좌표 */
+let cx = 0;
+let cy = 0;
 
-const images = [
-"image/day1.png",
-"image/day2.png",
-"image/day3.png",
-"image/day4.png",
-"image/day5.png",
-"image/day6.png",
-"image/day7.png",
-"image/day8.png",
-"image/day9.png",
-"image/day10.png"
+/* 중심 계산 (clock 기준) */
+function updateCenter(){
+
+  const rect = clock.getBoundingClientRect();
+
+  cx = rect.left + rect.width / 2;
+  cy = rect.top + rect.height / 2;
+
+}
+
+/* day 데이터 */
+const dayData = [
+  { id: 1, image: "image/day1.png", background: "image/bg_day1.png", page: "day1.html" },
+  { id: 2, image: "image/day2.png", background: "image/bg_day2.png", page: "day2.html" },
+  { id: 3, image: "image/day3.png", background: "image/bg_day3.png", page: "day3.html" },
+  { id: 4, image: "image/day4.png", background: "image/bg_day4.png", page: "day4.html" },
+  { id: 5, image: "image/day5.png", background: "image/bg_day5.png", page: "day5.html" },
+  { id: 6, image: "image/day6.png", background: "image/bg_day6.png", page: "day6.html" },
+  { id: 7, image: "image/day7.png", background: "image/bg_day7.png", page: "day7.html" },
+  { id: 8, image: "image/day8.png", background: "image/bg_day8.png", page: "day8.html" },
+  { id: 9, image: "image/day9.png", background: "image/bg_day9.png", page: "day9.html" },
+  { id: 10, image: "image/day10.png", background: "image/bg_day10.png", page: "day10.html" }
 ];
 
-/* 배경 이미지 */
-
-const backgrounds = [
-"image/bg_day1.png",
-"image/bg_day2.png",
-"image/bg_day3.png",
-"image/bg_day4.png",
-"image/bg_day5.png",
-"image/bg_day6.png",
-"image/bg_day7.png",
-"image/bg_day8.png",
-"image/bg_day9.png",
-"image/bg_day10.png"
-];
-
-/* 연결 페이지 */
-
-const pages = [
-"day1.html",
-"day2.html",
-"day3.html",
-"day4.html",
-"day5.html",
-"day6.html",
-"day7.html",
-"day8.html",
-"day9.html",
-"day10.html"
-];
-
-/* 시간 스케줄 */
-
+/* 시간 구조 */
 const schedule = [
-1,   // day10
-5,   // day1
-7,   // day2
-9,   // day3
-11,  // day4
-13,  // day5
-15,  // day6
-17,  // day7
-19,  // day8
-21   // day9
+  { hour: 1, dayId: 10 },
+  { hour: 5, dayId: 1 },
+  { hour: 7, dayId: 2 },
+  { hour: 9, dayId: 3 },
+  { hour: 11, dayId: 4 },
+  { hour: 13, dayId: 5 },
+  { hour: 15, dayId: 6 },
+  { hour: 17, dayId: 7 },
+  { hour: 19, dayId: 8 },
+  { hour: 21, dayId: 9 }
 ];
 
-/* ---------- 파리 시간 ---------- */
+/* 파리 시간 */
 
 function getParisHour(){
 
-const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-GB",{
+    timeZone:"Europe/Paris",
+    hour:"2-digit",
+    hour12:false
+  }).formatToParts(new Date());
 
-const hour = new Intl.DateTimeFormat("en-GB",{
-timeZone:"Europe/Paris",
-hour:"numeric",
-hour12:false
-}).format(now);
-
-return parseInt(hour);
+  return Number(parts.find(p=>p.type==="hour").value);
 
 }
 
-/* ---------- 현재 index ---------- */
+/* 현재 day */
 
-function getCurrentIndex(){
+function getCurrentDayId(){
 
-const hour = getParisHour();
+  const hour = getParisHour();
 
-for(let i=schedule.length-1;i>=0;i--){
+  for(let i=schedule.length-1;i>=0;i--){
 
-if(hour >= schedule[i]){
-return i;
+    if(hour >= schedule[i].hour){
+      return schedule[i].dayId;
+    }
+
+  }
+
+  return 10;
+
 }
 
+function getCurrentDayIndex(){
+
+  const id = getCurrentDayId();
+  return dayData.findIndex(d=>d.id===id);
+
 }
 
-return 0;
-
-}
-
-/* ---------- 시계 orbit ---------- */
+/* orbit */
 
 let rotation = 0;
 
 function animateClock(){
 
-rotation += 0.002;
+  rotation += 0.002;
 
-const radius = 400;
+  const radius = 390;
 
+  nodes.forEach((node,i)=>{
 
+    const angle = rotation + (i * (Math.PI*2/nodes.length));
 
-const cx = clock.offsetWidth / 2;
-const cy = clock.offsetHeight / 2;
+    const x = Math.cos(angle)*radius;
+    const y = Math.sin(angle)*radius;
 
-nodes.forEach((node,i)=>{
+    node.style.left = `calc(50% + ${x}px)`;
+    node.style.top = `calc(50% + ${y}px)`;
 
-const angle = rotation + (i * (Math.PI*2/nodes.length));
+  });
 
-const x = cx + Math.cos(angle)*radius;
-const y = cy + Math.sin(angle)*radius;
-
-node.style.left = x+"px";
-node.style.top = y+"px";
-
-});
-
-requestAnimationFrame(animateClock);
+  requestAnimationFrame(animateClock);
 
 }
 
-/* ---------- 이미지 + 배경 업데이트 ---------- */
+/* 이미지 업데이트 */
 
 function updateVisual(){
 
-const index = getCurrentIndex();
-const background = document.querySelector(".background");
+  const index = getCurrentDayIndex();
+  const day = dayData[index];
 
-/* 중앙 이미지 */
+  centerImage.style.opacity = 0;
 
-centerImage.style.opacity = 0;
+  setTimeout(()=>{
 
-setTimeout(()=>{
-centerImage.src = images[index];
-centerImage.style.opacity = 1;
-},300);
+    centerImage.src = day.image;
+    centerImage.style.opacity = 1;
 
-/* 배경 */
+  },300);
 
-document.querySelector(".background").style.backgroundImage = "url(" + backgrounds[index] + ")";
+  background.style.backgroundImage = `url("${day.background}")`;
 
-/* 현재 노드 숨기기 */
-
-nodes.forEach((node,i)=>{
-node.style.opacity = (i===index)?0:1;
-});
+  nodes.forEach((node,i)=>{
+    node.style.opacity = (i===index)?0:1;
+  });
 
 }
 
-/* ---------- preload ---------- */
+/* preload */
 
 function preloadImages(){
 
-[...images,...backgrounds].forEach(src=>{
-const img = new Image();
-img.src = src;
-});
+  dayData.forEach(d=>{
+
+    const img1 = new Image();
+    img1.src = d.image;
+
+    const img2 = new Image();
+    img2.src = d.background;
+
+  });
 
 }
 
-/* ---------- 클릭 이벤트 ---------- */
+/* 클릭 비활성화 */
 
-nodes.forEach((node,i)=>{
-
-node.style.cursor="pointer";
-
-node.addEventListener("click",()=>{
-window.location.href = pages[i];
+nodes.forEach((node)=>{
+  node.style.cursor="default";
 });
 
-});
+/* 실행 */
 
-/* 중앙 이미지 클릭 */
-
-centerImage.style.cursor="pointer";
-
-centerImage.addEventListener("click",()=>{
-
-const index = getCurrentIndex();
-
-window.location.href = pages[index];
-
-});
-
-/* ---------- 실행 ---------- */
 window.onload = function(){
-preloadImages();
 
-animateClock();
+  preloadImages();
 
-updateVisual();
+  updateCenter();
 
-setInterval(updateVisual,60000);
+  animateClock();
+
+  updateVisual();
+
+  setInterval(updateVisual,60000);
+
 };
+
+/* 화면 변경 */
+
+window.addEventListener("resize",()=>{
+  updateCenter();
+});
