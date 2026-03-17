@@ -606,7 +606,20 @@ text-align:right;
 }
 
 body.winter{
+margin:0;
 background:#7a2cff;
+overflow:hidden;
+position:relative;
+}
+
+body.winter #game{
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+display:block;
+z-index:1;
 }
 
 .file{
@@ -624,17 +637,24 @@ position:fixed;
 top:20px;
 right:20px;
 z-index:20;
-
 display:flex;
 flex-direction:column;
 gap:8px;
-
 color:white;
 font-family:monospace;
 font-size:20px;
 }
 
-/* 모든 개별 위치 강제 제거 */
+body.winter .back{
+position:fixed;
+top:20px;
+left:20px;
+z-index:30;
+color:white;
+text-decoration:none;
+font-family:monospace;
+font-size:20px;
+}
 
 body.winter #temp,
 body.winter #life,
